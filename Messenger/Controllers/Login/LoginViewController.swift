@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
     
@@ -151,15 +152,25 @@ class LoginViewController: UIViewController {
         
         self.view.endEditing(true)
         
-        guard let email = emailTextField.text, let password = passwordTextField.text,
+        guard let email = emailTextField.text,
+              let password = passwordTextField.text,
               !email.isEmpty, !password.isEmpty,
               password.count >= 6 else {
                   alertUserLoginError()
                   return
               }
         
-        // Firebase entry point
-        print("Store data in Firebase")
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+            guard let result = authResult, error == nil else {return}
+            
+            print("DEBUG: User logged in")
+            UserDefaults.standard.set(true, forKey: "logged_in")
+            let vc = ConversationsViewController()
+            let nav = UINavigationController(rootViewController: vc)
+            nav.modalPresentationStyle = .fullScreen
+            self.present(nav, animated: true)
+        }
+
     }
     
     
