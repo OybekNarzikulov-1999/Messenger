@@ -7,4 +7,6 @@ target 'Messenger' do
 
   # Pods for Messenger
 
+	pod 'SnapKit', '~> 5.0.0'
+
 end
