@@ -119,7 +119,7 @@ class LoginViewController: UIViewController {
         emailTextField.snp.makeConstraints { make in
             make.left.equalTo(view).offset(30)
             make.right.equalTo(view).offset(-30)
-            make.top.equalTo(imageView.snp.bottom).offset(20)
+            make.top.equalTo(imageView.snp.bottom).offset(30)
             make.height.equalTo(52)
         }
         
