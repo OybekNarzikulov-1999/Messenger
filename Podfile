@@ -7,8 +7,15 @@ target 'Messenger' do
 
   # Pods for Messenger
 
+	# Firebase
+
 	pod 'SnapKit', '~> 5.0.0'
 	pod 'FirebaseDatabase'
 	pod 'FirebaseAuth'
+
+  	# Facebook
+
+	pod 'FBSDKLoginKit'
+
 end
 

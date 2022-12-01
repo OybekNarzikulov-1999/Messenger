@@ -213,38 +213,42 @@ class RegisterViewController: UIViewController {
         self.view.endEditing(true)
         
         guard let firstName = firstNameTextField.text,
-              let secondName = secondNameTextField.text,
+              let lastName = secondNameTextField.text,
               let email = emailTextField.text,
               let password = passwordTextField.text,
-              !firstName.isEmpty, !secondName.isEmpty,
+              !firstName.isEmpty, !lastName.isEmpty,
               !email.isEmpty, !password.isEmpty,
               password.count >= 6 else {
                   alertUserLoginError()
                   return
               }
         
-        // Firebase entry point
-        
-        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-            guard let result = authResult, error == nil else {
+        DatabaseManager.shared.userExists(withEmail: email) { [weak self] exist in
+            guard let strongSelf = self else {return}
+            guard !exist else {
                 return
             }
-            print("DEBUG: RESULT: \(result)")
-            UserDefaults.standard.set(true, forKey: "logged_in")
-            let vc = ConversationsViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen
-            self.present(nav, animated: true)
+            
+            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password) { auth, error in
+                guard auth != nil, error == nil else {
+                    return
+                }
+                
+                DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName,
+                                                                    lastName: lastName,
+                                                                    emailAddress: email))
+                
+                strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+            }
         }
-        
     }
     
     
     // MARK: - Helper Functions
     
-    func alertUserLoginError(){
+    func alertUserLoginError(withMessage: String = "Please entry all information to create an account"){
         
-        let alert = UIAlertController(title: "Ooops", message: "Please entry all information to create an account", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Ooops", message: withMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "dismiss", style: .cancel, handler: nil))
         present(alert, animated: true)
     }

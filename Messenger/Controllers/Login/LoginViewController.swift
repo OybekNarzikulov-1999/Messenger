@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import FirebaseAuth
+import FBSDKLoginKit
 
 class LoginViewController: UIViewController {
     
@@ -79,6 +80,18 @@ class LoginViewController: UIViewController {
         
     }()
     
+    private lazy var facebookLoginButton: FBLoginButton = {
+       
+        let button = FBLoginButton()
+        button.backgroundColor = .link
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
+        button.titleLabel?.font = .boldSystemFont(ofSize: 20)
+        button.frame.size = CGSize(width: view.frame.size.width - 60, height: 52)
+        return button
+        
+    }()
+    
     
     // MARK: - Lifecycle
     
@@ -100,6 +113,7 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(emailTextField)
         scrollView.addSubview(passwordTextField)
         scrollView.addSubview(loginButton)
+        scrollView.addSubview(facebookLoginButton)
         
     }
     
@@ -138,6 +152,13 @@ class LoginViewController: UIViewController {
             make.height.equalTo(52)
         }
         
+        facebookLoginButton.snp.makeConstraints { make in
+            make.left.equalTo(view).offset(30)
+            make.right.equalTo(view).offset(-30)
+            make.top.equalTo(loginButton.snp.bottom).offset(20)
+            make.height.equalTo(52)
+        }
+        
     }
     
     // MARK: - Selectors
@@ -160,15 +181,12 @@ class LoginViewController: UIViewController {
                   return
               }
         
-        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { [weak self] authResult, error in
+            guard let strongSelf = self else {return}
             guard let result = authResult, error == nil else {return}
             
             print("DEBUG: User logged in")
-            UserDefaults.standard.set(true, forKey: "logged_in")
-            let vc = ConversationsViewController()
-            let nav = UINavigationController(rootViewController: vc)
-            nav.modalPresentationStyle = .fullScreen
-            self.present(nav, animated: true)
+            strongSelf.navigationController?.dismiss(animated: true, completion: nil)
         }
 
     }

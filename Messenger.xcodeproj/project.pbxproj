@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		55EA1A9A88F7EBCDF653BEC7 /* Pods_Messenger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B615F2FBA3ED0F9BBC93534 /* Pods_Messenger.framework */; };
+		EA01FE902938BA99003810C1 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA01FE8F2938BA99003810C1 /* DatabaseManager.swift */; };
+		EA01FE922938C073003810C1 /* ChatAppUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA01FE912938C073003810C1 /* ChatAppUser.swift */; };
 		EA07E5B829334C63006CD6DF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5B729334C63006CD6DF /* AppDelegate.swift */; };
 		EA07E5BA29334C63006CD6DF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5B929334C63006CD6DF /* SceneDelegate.swift */; };
 		EA07E5BC29334C63006CD6DF /* ConversationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5BB29334C63006CD6DF /* ConversationsViewController.swift */; };
@@ -22,11 +24,14 @@
 		EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */; };
 		EA07E5DF29376CFF006CD6DF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5DE29376CFF006CD6DF /* Extensions.swift */; };
 		EA07E5E129379014006CD6DF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA07E5E029379014006CD6DF /* GoogleService-Info.plist */; };
+		EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		4B615F2FBA3ED0F9BBC93534 /* Pods_Messenger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Messenger.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A98848ED9F8329A91C37D45C /* Pods-Messenger.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.debug.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.debug.xcconfig"; sourceTree = "<group>"; };
+		EA01FE8F2938BA99003810C1 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		EA01FE912938C073003810C1 /* ChatAppUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAppUser.swift; sourceTree = "<group>"; };
 		EA07E5B429334C63006CD6DF /* Messenger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Messenger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA07E5B729334C63006CD6DF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EA07E5B929334C63006CD6DF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -43,6 +48,8 @@
 		EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
 		EA07E5DE29376CFF006CD6DF /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EA07E5E029379014006CD6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
+		EA4428002938E77C003F9C1C /* Messenger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Messenger.entitlements; sourceTree = "<group>"; };
 		F5EC753ECE46E4B5CA8B274F /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +95,7 @@
 		EA07E5B629334C63006CD6DF /* Messenger */ = {
 			isa = PBXGroup;
 			children = (
+				EA4428002938E77C003F9C1C /* Messenger.entitlements */,
 				EA07E5CF29334C8A006CD6DF /* Resources */,
 				EA07E5CE29334C73006CD6DF /* ViewModels */,
 				EA07E5CD29334C72006CD6DF /* Models */,
@@ -108,6 +116,7 @@
 				EA07E5D729334F50006CD6DF /* PhotoViewerViewController.swift */,
 				EA07E5D929334F5D006CD6DF /* VideoPlayerViewController.swift */,
 				EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */,
+				EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -124,6 +133,7 @@
 		EA07E5CD29334C72006CD6DF /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				EA01FE912938C073003810C1 /* ChatAppUser.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -141,6 +151,7 @@
 				EA07E5B729334C63006CD6DF /* AppDelegate.swift */,
 				EA07E5B929334C63006CD6DF /* SceneDelegate.swift */,
 				EA07E5DE29376CFF006CD6DF /* Extensions.swift */,
+				EA01FE8F2938BA99003810C1 /* DatabaseManager.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -288,13 +299,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA07E5D629334F36006CD6DF /* ProfileViewController.swift in Sources */,
+				EA01FE902938BA99003810C1 /* DatabaseManager.swift in Sources */,
 				EA07E5D229334F24006CD6DF /* LoginViewController.swift in Sources */,
 				EA07E5D429334F2D006CD6DF /* RegisterViewController.swift in Sources */,
+				EA01FE922938C073003810C1 /* ChatAppUser.swift in Sources */,
 				EA07E5D829334F51006CD6DF /* PhotoViewerViewController.swift in Sources */,
 				EA07E5BC29334C63006CD6DF /* ConversationsViewController.swift in Sources */,
 				EA07E5DF29376CFF006CD6DF /* Extensions.swift in Sources */,
 				EA07E5DA29334F5D006CD6DF /* VideoPlayerViewController.swift in Sources */,
 				EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */,
+				EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */,
 				EA07E5B829334C63006CD6DF /* AppDelegate.swift in Sources */,
 				EA07E5BA29334C63006CD6DF /* SceneDelegate.swift in Sources */,
 			);
@@ -444,6 +458,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Messenger/Messenger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 245CFNF5C7;
@@ -475,6 +490,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Messenger/Messenger.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 245CFNF5C7;
