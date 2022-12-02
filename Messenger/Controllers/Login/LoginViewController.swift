@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 import FirebaseAuth
 import FBSDKLoginKit
+import GoogleSignIn
+import FirebaseCore
 
 class LoginViewController: UIViewController {
     
@@ -92,6 +94,15 @@ class LoginViewController: UIViewController {
         
     }()
     
+    private lazy var googleLoginButton: GIDSignInButton = {
+        let button = GIDSignInButton()
+        button.addTarget(self, action: #selector(handleGoogleButton), for: .touchUpInside)
+        button.layer.cornerRadius = 12
+        button.layer.masksToBounds = true
+        button.frame.size = CGSize(width: view.frame.size.width - 60, height: 52)
+        return button
+    }()
+    
     
     // MARK: - Lifecycle
     
@@ -114,7 +125,7 @@ class LoginViewController: UIViewController {
         scrollView.addSubview(passwordTextField)
         scrollView.addSubview(loginButton)
         scrollView.addSubview(facebookLoginButton)
-        
+        scrollView.addSubview(googleLoginButton)
     }
     
     override func viewDidLayoutSubviews() {
@@ -159,6 +170,13 @@ class LoginViewController: UIViewController {
             make.height.equalTo(52)
         }
         
+        googleLoginButton.snp.makeConstraints { make in
+            make.left.equalTo(view).offset(30)
+            make.right.equalTo(view).offset(-30)
+            make.top.equalTo(facebookLoginButton.snp.bottom).offset(20)
+            make.height.equalTo(52)
+        }
+        
     }
     
     // MARK: - Selectors
@@ -191,8 +209,32 @@ class LoginViewController: UIViewController {
 
     }
     
+    @objc func handleGoogleButton(){
+        guard let clientID = FirebaseApp.app()?.options.clientID else {return}
+        let config = GIDConfiguration(clientID: clientID)
+        
+        GIDSignIn.sharedInstance.signIn(with: config, presenting: self) { [unowned self] user, error in
+            
+            guard error == nil else {return}
+            
+            guard let authentication = user?.authentication, let idToken = authentication.idToken else {return}
+            
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: authentication.accessToken)
+            
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print("Failed to sign in with google")
+                    return
+                }
+                // User is signed in
+                print("DEBUG: User logged in")
+                self.navigationController?.dismiss(animated: true, completion: nil)
+            }
+        }
+    }
     
-    // MARK: - Helper Functions
+    
+    // MARK: - Helper Function
     
     func alertUserLoginError(){
         
