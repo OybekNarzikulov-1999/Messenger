@@ -96,7 +96,7 @@ class LoginViewController: UIViewController {
     
     private lazy var googleLoginButton: GIDSignInButton = {
         let button = GIDSignInButton()
-        button.addTarget(self, action: #selector(handleGoogleButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(googleButtonPressed), for: .touchUpInside)
         button.layer.cornerRadius = 12
         button.layer.masksToBounds = true
         button.frame.size = CGSize(width: view.frame.size.width - 60, height: 52)
@@ -209,7 +209,7 @@ class LoginViewController: UIViewController {
 
     }
     
-    @objc func handleGoogleButton(){
+    @objc func googleButtonPressed(){
         guard let clientID = FirebaseApp.app()?.options.clientID else {return}
         let config = GIDConfiguration(clientID: clientID)
         
@@ -217,12 +217,20 @@ class LoginViewController: UIViewController {
             
             guard error == nil else {return}
             
-            guard let authentication = user?.authentication, let idToken = authentication.idToken else {return}
+            guard let email = user?.profile?.email, let firstName = user?.profile?.givenName, let lastName = user?.profile?.familyName else {return}
             
+            DatabaseManager.shared.userExists(withEmail: email) { exists in
+                if !exists {
+                    // Insert user to database
+                    DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email))
+                }
+            }
+            
+            guard let authentication = user?.authentication, let idToken = authentication.idToken else {return}
             let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: authentication.accessToken)
             
             Auth.auth().signIn(with: credential) { authResult, error in
-                if let error = error {
+                if error != nil {
                     print("Failed to sign in with google")
                     return
                 }

@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import GoogleSignIn
 
 private let reuseID = "Cell"
 
@@ -69,7 +70,14 @@ extension ProfileViewController: UITableViewDelegate, UITableViewDataSource {
         
         let actioSheet = UIAlertController(title: "Do you wanna log out?", message: nil, preferredStyle: .actionSheet)
         actioSheet.addAction(UIAlertAction(title: "Log Out", style: .destructive, handler: { [weak self] _ in
+            
             guard let strongSelf = self else {return}
+            
+            // Facebook Log Out
+            
+            // Google Log Out
+            GIDSignIn.sharedInstance.signOut()
+            
             do {
                 try FirebaseAuth.Auth.auth().signOut()
                 
