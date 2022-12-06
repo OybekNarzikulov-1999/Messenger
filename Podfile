@@ -12,6 +12,7 @@ target 'Messenger' do
 	pod 'SnapKit', '~> 5.0.0'
 	pod 'FirebaseDatabase'
 	pod 'FirebaseAuth'
+	pod 'FirebaseStorage'
 
   	# Facebook
 	pod 'FBSDKLoginKit'
@@ -21,7 +22,6 @@ target 'Messenger' do
 
 	pod 'MessageKit'
 	pod 'JGProgressHUD'
-	pod 'RealmSwift'
 	pod 'SDWebImage'
 
 end

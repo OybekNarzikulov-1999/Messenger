@@ -15,7 +15,7 @@ class TabBarViewController: UITabBarController {
         let vc1 = ConversationsViewController()
         let vc2 = ProfileViewController()
         
-        vc1.title = "Chats"
+        vc1.title = "Conversations"
         vc2.title = "Profile"
         
         vc1.navigationItem.largeTitleDisplayMode = .always
