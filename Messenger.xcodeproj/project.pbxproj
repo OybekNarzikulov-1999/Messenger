@@ -26,6 +26,7 @@
 		EA07E5E129379014006CD6DF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA07E5E029379014006CD6DF /* GoogleService-Info.plist */; };
 		EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */; };
 		EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABCE7D9293F7B31001AB327 /* ChatViewController.swift */; };
+		EADAE5AE2969A2CD00BEBA9A /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADAE5AD2969A2CD00BEBA9A /* StorageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 		EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		EA4428002938E77C003F9C1C /* Messenger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Messenger.entitlements; sourceTree = "<group>"; };
 		EABCE7D9293F7B31001AB327 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		EADAE5AD2969A2CD00BEBA9A /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		F5EC753ECE46E4B5CA8B274F /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -155,6 +157,7 @@
 				EA07E5B929334C63006CD6DF /* SceneDelegate.swift */,
 				EA07E5DE29376CFF006CD6DF /* Extensions.swift */,
 				EA01FE8F2938BA99003810C1 /* DatabaseManager.swift */,
+				EADAE5AD2969A2CD00BEBA9A /* StorageManager.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 				EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */,
 				EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */,
 				EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */,
+				EADAE5AE2969A2CD00BEBA9A /* StorageManager.swift in Sources */,
 				EA07E5B829334C63006CD6DF /* AppDelegate.swift in Sources */,
 				EA07E5BA29334C63006CD6DF /* SceneDelegate.swift in Sources */,
 			);
@@ -375,6 +379,8 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
+				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -436,7 +442,9 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_PREVIEWS = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;

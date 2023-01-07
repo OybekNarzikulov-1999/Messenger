@@ -18,4 +18,8 @@ struct ChatAppUser {
         email = email.replacingOccurrences(of: "@", with: "-")
         return email
     }
+    
+    var profilePictureFilename: String {
+        return "\(safeEmail)_profile_picture.png"
+    }
 }

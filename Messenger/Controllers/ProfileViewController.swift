@@ -30,21 +30,42 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        //        navigationController?.tabBarController?.tabBar.backgroundColor = .white
+        configureNavigationBar()
         
         configureTableView()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        tableView.snp.makeConstraints { make in
+            make.left.right.top.bottom.equalTo(0)
+        }
     }
     
     
     // MARK: - Helper Methods
     
+    private func configureNavigationBar(){
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.backgroundColor = .white
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+
+            navigationController?.navigationBar.tintColor = .black
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.compactAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        } else {
+            UINavigationBar.appearance().tintColor = .black
+            UINavigationBar.appearance().barTintColor = .black
+            UINavigationBar.appearance().isTranslucent = false
+        }
+    }
+    
     func configureTableView(){
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
-        tableView.snp.makeConstraints { make in
-            make.left.right.top.bottom.equalTo(0)
-        }
     }
     
 }

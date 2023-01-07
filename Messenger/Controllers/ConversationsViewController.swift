@@ -7,12 +7,15 @@
 
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
 private let reuseID = "Cell"
 
 class ConversationsViewController: UIViewController {
 
     // MARK: -  Properties
+    
+    private let spinner = JGProgressHUD(style: .dark)
     
     private let tableView: UITableView = {
        
@@ -40,7 +43,10 @@ class ConversationsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        view.addSubview(noConversationsLabel)
         configureTableView()
+        fetchConversations()
+        configureNavigationBar()
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapComposeButton))
     }
@@ -63,12 +69,29 @@ class ConversationsViewController: UIViewController {
     
     // MARK: - Helper Methods
     
+    private func configureNavigationBar(){
+        if #available(iOS 13.0, *) {
+            let appearance = UINavigationBarAppearance()
+            appearance.backgroundColor = .white
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+
+            navigationController?.navigationBar.tintColor = .black
+            navigationController?.navigationBar.standardAppearance = appearance
+            navigationController?.navigationBar.compactAppearance = appearance
+            navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        } else {
+            UINavigationBar.appearance().tintColor = .black
+            UINavigationBar.appearance().barTintColor = .black
+            UINavigationBar.appearance().isTranslucent = false
+        }
+    }
+    
     private func configureTableView(){
         
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
-        tableView.isHidden = false
     }
     
     private func validateAuth(){
@@ -79,7 +102,10 @@ class ConversationsViewController: UIViewController {
             present(nav, animated: false)
         }
     }
-
+    
+    private func fetchConversations(){
+        tableView.isHidden = false
+    }
 }
 
 extension ConversationsViewController: UITableViewDelegate, UITableViewDataSource {

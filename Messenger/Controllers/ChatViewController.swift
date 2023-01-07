@@ -34,7 +34,6 @@ class ChatViewController: MessagesViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureNavigationBar()
         
         messages.append(Message(sender: selfSender, messageId: "1", sentDate: Date(), kind: .text("Hello")))
         messages.append(Message(sender: selfSender, messageId: "1", sentDate: Date(), kind: .text("I have just finished my work, can we meet somewhere and have a lunch maybe. What do u think?")))
@@ -49,24 +48,6 @@ class ChatViewController: MessagesViewController {
     
     
     // MARK: - Helper Methods
-    
-    private func configureNavigationBar(){
-        if #available(iOS 13.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.backgroundColor = .white
-            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
-            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
-
-            navigationController?.navigationBar.tintColor = .black
-            navigationController?.navigationBar.standardAppearance = appearance
-            navigationController?.navigationBar.compactAppearance = appearance
-            navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        } else {
-            UINavigationBar.appearance().tintColor = .black
-            UINavigationBar.appearance().barTintColor = .black
-            UINavigationBar.appearance().isTranslucent = false
-        }
-    }
 
 }
 

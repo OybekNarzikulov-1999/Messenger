@@ -206,6 +206,7 @@ class LoginViewController: UIViewController {
         
         spinner.show(in: view)
         
+        // Firebase LogIn
         FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { [weak self] _, error in
             guard let strongSelf = self else {return}
             
@@ -213,7 +214,11 @@ class LoginViewController: UIViewController {
                 strongSelf.spinner.dismiss(animated: true)
             }
             
-            guard error == nil else {return}
+            guard error == nil else {
+                strongSelf.alertUserLoginError()
+                return
+                
+            }
             
             print("DEBUG: User logged in")
             strongSelf.navigationController?.dismiss(animated: true, completion: nil)
@@ -234,7 +239,34 @@ class LoginViewController: UIViewController {
             DatabaseManager.shared.userExists(withEmail: email) { exists in
                 if !exists {
                     // Insert user to database
-                    DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email))
+                    let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
+                    DatabaseManager.shared.insertUser(with: chatUser) { success in
+                        if success {
+                            // upload user
+                            
+                            if let _ = user?.profile?.hasImage {
+                                
+                                guard let imageUrl = user?.profile?.imageURL(withDimension: 200) else {return}
+                                URLSession.shared.dataTask(with: imageUrl) { data, _, _ in
+                                    guard let data = data else {return}
+                                    let fileName = chatUser.profilePictureFilename
+                                    StorageManager.shared.uploadProfilePicture(with: data, fileName: fileName) { result in
+                                        switch result {
+                                        case .success(let downloadUrl):
+                                            
+                                            UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                            print("\(downloadUrl)")
+                                            
+                                        case .failure(let error):
+                                            
+                                            print("StorageManager error: \(error)")
+                                            
+                                        }
+                                    }
+                                }.resume()
+                            }
+                        }
+                    }
                 }
             }
             
@@ -258,7 +290,7 @@ class LoginViewController: UIViewController {
     
     func alertUserLoginError(){
         
-        let alert = UIAlertController(title: "Ooops", message: "Please entry all information to log in", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Ooops", message: "Please write information correctly to log in", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "dismiss", style: .cancel, handler: nil))
         present(alert, animated: true)
     }

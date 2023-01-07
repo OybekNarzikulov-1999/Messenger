@@ -228,11 +228,14 @@ class RegisterViewController: UIViewController {
         
         spinner.show(in: view)
         
+        // Firebase register
         DatabaseManager.shared.userExists(withEmail: email) { [weak self] exist in
             guard let strongSelf = self else {return}
+            
             DispatchQueue.main.async {
                 strongSelf.spinner.dismiss(animated: true)
             }
+            
             guard !exist else {
                 strongSelf.alertUserLoginError(withMessage: "Looks like a user already has an account. Please log in")
                 return
@@ -243,9 +246,31 @@ class RegisterViewController: UIViewController {
                     return
                 }
                 
-                DatabaseManager.shared.insertUser(with: ChatAppUser(firstName: firstName,
-                                                                    lastName: lastName,
-                                                                    emailAddress: email))
+                let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
+                
+                DatabaseManager.shared.insertUser(with: chatUser) { success in
+                    if success {
+                        // upload image
+                        
+                        guard let image = strongSelf.imageView.image, let data = image.pngData() else {
+                            return
+                        }
+                        let fileName = chatUser.profilePictureFilename
+                        StorageManager.shared.uploadProfilePicture(with: data, fileName: fileName) { result in
+                            switch result {
+                            case .success(let downloadUrl):
+                                
+                                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                print("\(downloadUrl)")
+                                
+                            case .failure(let error):
+                                
+                                print("StorageManager error: \(error)")
+                                
+                            }
+                        }
+                    } 
+                }
                 
                 strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             }
