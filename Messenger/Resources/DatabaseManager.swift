@@ -18,9 +18,7 @@ final class DatabaseManager {
         let userDict = ["first_name": user.firstName,
                         "last_name": user.lastName]
         
-        guard let safeEmail = user.safeEmail else {return}
-        
-        database.child(safeEmail).setValue(userDict) { error, _ in
+        database.child(user.safeEmail).setValue(userDict) { error, _ in
             guard error == nil else {
                 print("failed to store data in firebase database")
                 completion(false)
@@ -36,12 +34,18 @@ final class DatabaseManager {
         safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
         
         database.child(safeEmail).observeSingleEvent(of: .value) { snapshot in
-            guard snapshot.value as? String != nil else {
+            guard snapshot.value as? [String:Any] != nil else {
                 completion(false)
                 return
             }
             completion(true)
         }
+    }
+    
+    public func safeEmail(emailAddress: String) -> String {
+        var email = emailAddress.replacingOccurrences(of: ".", with: "-")
+        email = email.replacingOccurrences(of: "@", with: "-")
+        return email
     }
     
 }

@@ -228,6 +228,8 @@ class RegisterViewController: UIViewController {
         
         spinner.show(in: view)
         
+        UserDefaults.standard.set(email, forKey: "email")
+        
         // Firebase register
         DatabaseManager.shared.userExists(withEmail: email) { [weak self] exist in
             guard let strongSelf = self else {return}
@@ -251,7 +253,6 @@ class RegisterViewController: UIViewController {
                 DatabaseManager.shared.insertUser(with: chatUser) { success in
                     if success {
                         // upload image
-                        
                         guard let image = strongSelf.imageView.image, let data = image.pngData() else {
                             return
                         }
@@ -260,7 +261,7 @@ class RegisterViewController: UIViewController {
                             switch result {
                             case .success(let downloadUrl):
                                 
-                                UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                UserDefaults.standard.set(downloadUrl, forKey: Constants.profileImageDowloadURL)
                                 print("\(downloadUrl)")
                                 
                             case .failure(let error):

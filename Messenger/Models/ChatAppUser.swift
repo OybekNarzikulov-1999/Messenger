@@ -13,7 +13,7 @@ struct ChatAppUser {
     let lastName: String
     let emailAddress: String
     
-    var safeEmail: String? {
+    var safeEmail: String {
         var email = emailAddress.replacingOccurrences(of: ".", with: "-")
         email = email.replacingOccurrences(of: "@", with: "-")
         return email

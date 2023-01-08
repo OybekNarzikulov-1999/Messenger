@@ -46,4 +46,17 @@ final class StorageManager {
         case FailedToDownloadURL
     }
     
+    public func downloadURL(for path: String, completion: @escaping (Result<URL,Error>) -> Void) {
+        
+        self.storage.child(path).downloadURL { url, error in
+            guard let url = url, error == nil else {
+                print("Failed to download url from firebase storage")
+                completion(.failure(StorageErrors.FailedToDownloadURL))
+                return
+            }
+            completion(.success(url))
+        }
+        
+    }
+    
 }

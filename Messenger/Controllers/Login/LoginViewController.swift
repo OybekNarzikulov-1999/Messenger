@@ -234,7 +234,11 @@ class LoginViewController: UIViewController {
             
             guard error == nil else {return}
             
-            guard let email = user?.profile?.email, let firstName = user?.profile?.givenName, let lastName = user?.profile?.familyName else {return}
+            guard let email = user?.profile?.email,
+                  let firstName = user?.profile?.givenName,
+                  let lastName = user?.profile?.familyName else {return}
+            
+            UserDefaults.standard.set(email, forKey: "email")
             
             DatabaseManager.shared.userExists(withEmail: email) { exists in
                 if !exists {
@@ -254,7 +258,7 @@ class LoginViewController: UIViewController {
                                         switch result {
                                         case .success(let downloadUrl):
                                             
-                                            UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+                                            UserDefaults.standard.set(downloadUrl, forKey: Constants.profileImageDowloadURL)
                                             print("\(downloadUrl)")
                                             
                                         case .failure(let error):
