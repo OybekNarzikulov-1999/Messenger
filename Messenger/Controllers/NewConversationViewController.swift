@@ -18,6 +18,8 @@ class NewConversationViewController: UIViewController {
     private var results = [[String: String]]()
     private var hasFetched = false
     
+    public var completion: (([String: String]) -> Void)?
+    
     private let spinner = JGProgressHUD(style: .dark)
     
     private let searchBar: UISearchBar = {
@@ -100,11 +102,10 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
          tableView.deselectRow(at: indexPath, animated: true)
         
-        let vc = ChatViewController()
-        vc.title = "Chat"
-        vc.navigationItem.largeTitleDisplayMode = .never
-        navigationController?.pushViewController(vc, animated: true)
-        
+        let selectedUser = results[indexPath.row]
+        self.dismiss(animated: true) {
+            self.completion?(selectedUser)
+        }
     }
 }
 

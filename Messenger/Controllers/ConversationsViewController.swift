@@ -63,6 +63,13 @@ class ConversationsViewController: UIViewController {
     
     @objc private func didTapComposeButton(){
         let vc = NewConversationViewController()
+        vc.completion = {result in
+            print(result)
+            let vc = ChatViewController()
+            vc.title = "Chat"
+            vc.navigationItem.largeTitleDisplayMode = .never
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
         let nav = UINavigationController(rootViewController: vc)
         present(nav, animated: true)
     }
