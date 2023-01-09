@@ -86,10 +86,10 @@ class ProfileViewController: UIViewController {
         profileImage.backgroundColor = .white
         headerView.addSubview(profileImage)
         
-        StorageManager.shared.downloadURL(for: path) { result in
+        StorageManager.shared.downloadURL(for: path) { [weak self] result in
             switch result {
             case .success(let url):
-                self.downloadImage(imageView: profileImage, url: url)
+                self?.downloadImage(imageView: profileImage, url: url)
             case .failure(let error):
                 print("Error: \(error)")
             }

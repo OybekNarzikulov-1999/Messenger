@@ -24,7 +24,55 @@ final class DatabaseManager {
                 completion(false)
                 return
             }
-            completion(true)
+            
+            self.database.child("users").observeSingleEvent(of: .value) { snapshot in
+                if let userCollection = snapshot.value as? [String:String] {
+                    // add user to collection and update database
+                    let newElement = [
+                        "name": user.firstName + " " + user.lastName,
+                        "email":user.safeEmail
+                    ]
+                    var newCollection = [[String:String]]()
+                    newCollection.append(userCollection)
+                    newCollection.append(newElement)
+                    self.database.child("users").setValue(newCollection) { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+                        completion(true)
+                    }
+                } else if var usersCollection = snapshot.value as? [[String:String]] {
+                   
+                    let newElement = [
+                        "name": user.firstName + " " + user.lastName,
+                        "email":user.safeEmail
+                    ]
+                    
+                    usersCollection.append(newElement)
+                    self.database.child("users").setValue(usersCollection) { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+                        completion(true)
+                    }
+                    
+                } else {
+                    // create collection and upload to database
+                    let newCollection: [String:String] = [
+                        "name": user.firstName + " " + user.lastName,
+                        "email":user.safeEmail
+                    ]
+                    self.database.child("users").setValue(newCollection) { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+                        completion(true)
+                    }
+                }
+            }
         }
     }
     
@@ -46,6 +94,22 @@ final class DatabaseManager {
         var email = emailAddress.replacingOccurrences(of: ".", with: "-")
         email = email.replacingOccurrences(of: "@", with: "-")
         return email
+    }
+    
+    public func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void){
+        
+        self.database.child("users").observeSingleEvent(of: .value) { snapshot in
+            if let _ = snapshot.value as? [String: String] {
+                completion(.failure(FetchError.failedToFetchUsers))
+            } else if let users = snapshot.value as? [[String: String]]{
+                completion(.success(users))
+            }
+        }
+        
+    }
+    
+    public enum FetchError: Error {
+        case failedToFetchUsers
     }
     
 }
