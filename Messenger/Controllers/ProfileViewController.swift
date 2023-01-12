@@ -70,7 +70,7 @@ class ProfileViewController: UIViewController {
         
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return nil}
         
-        let safeEmail = DatabaseManager.shared.safeEmail(emailAddress: email)
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         let filename = "\(safeEmail)_profile_picture.png"
         let path = "images/\(filename)"
                 

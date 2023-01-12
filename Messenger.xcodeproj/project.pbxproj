@@ -28,6 +28,7 @@
 		EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABCE7D9293F7B31001AB327 /* ChatViewController.swift */; };
 		EADAE5AE2969A2CD00BEBA9A /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADAE5AD2969A2CD00BEBA9A /* StorageManager.swift */; };
 		EAF2C6F3296B2D16004B4108 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF2C6F2296B2D16004B4108 /* Constants.swift */; };
+		EAF2C6F529705DFA004B4108 /* ConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAF2C6F429705DFA004B4108 /* ConversationTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		EABCE7D9293F7B31001AB327 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		EADAE5AD2969A2CD00BEBA9A /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		EAF2C6F2296B2D16004B4108 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		EAF2C6F429705DFA004B4108 /* ConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationTableViewCell.swift; sourceTree = "<group>"; };
 		F5EC753ECE46E4B5CA8B274F /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,7 +105,6 @@
 			children = (
 				EA4428002938E77C003F9C1C /* Messenger.entitlements */,
 				EA07E5CF29334C8A006CD6DF /* Resources */,
-				EA07E5CE29334C73006CD6DF /* ViewModels */,
 				EA07E5CD29334C72006CD6DF /* Models */,
 				EA07E5CC29334C71006CD6DF /* Views */,
 				EA07E5CB29334C6B006CD6DF /* Controllers */,
@@ -133,6 +134,7 @@
 			children = (
 				EA07E5D029334CA2006CD6DF /* Storyboards */,
 				EA07E5C029334C64006CD6DF /* Assets.xcassets */,
+				EAF2C6F429705DFA004B4108 /* ConversationTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -143,13 +145,6 @@
 				EA01FE912938C073003810C1 /* ChatAppUser.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		EA07E5CE29334C73006CD6DF /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		EA07E5CF29334C8A006CD6DF /* Resources */ = {
@@ -319,6 +314,7 @@
 				EA07E5DA29334F5D006CD6DF /* VideoPlayerViewController.swift in Sources */,
 				EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */,
 				EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */,
+				EAF2C6F529705DFA004B4108 /* ConversationTableViewCell.swift in Sources */,
 				EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */,
 				EADAE5AE2969A2CD00BEBA9A /* StorageManager.swift in Sources */,
 				EA07E5B829334C63006CD6DF /* AppDelegate.swift in Sources */,
