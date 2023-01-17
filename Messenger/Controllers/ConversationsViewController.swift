@@ -81,7 +81,7 @@ class ConversationsViewController: UIViewController {
         vc.completion = {result in
             
             guard let name = result["name"], let email = result["email"] else {return}
-            let vc = ChatViewController(with: email)
+            let vc = ChatViewController(with: email, id: nil)
             vc.isNewConversation = true
             vc.title = name
             vc.navigationItem.largeTitleDisplayMode = .never
@@ -175,7 +175,7 @@ extension ConversationsViewController: UITableViewDelegate, UITableViewDataSourc
         
         let model = conversations[indexPath.row]
         
-        let vc = ChatViewController(with: model.otherUserEmail)
+        let vc = ChatViewController(with: model.otherUserEmail, id: model.id)
         vc.title = model.otherUserName
         vc.navigationItem.largeTitleDisplayMode = .never
         navigationController?.pushViewController(vc, animated: true)

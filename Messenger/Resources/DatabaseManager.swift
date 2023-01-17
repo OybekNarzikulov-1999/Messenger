@@ -156,10 +156,10 @@ extension DatabaseManager {
             return
         }
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-        
+        print(email)
         let ref = database.child("\(safeEmail)")
         
-        ref.observeSingleEvent(of: .value) { snapshot in
+        ref.observeSingleEvent(of: .value) { [weak self] snapshot in
             guard var userNode = snapshot.value as? [String: Any] else {
                 completion(false)
                 return
@@ -207,6 +207,41 @@ extension DatabaseManager {
                 ]
             ]
             
+            let recipient_conversation: [String: Any] = [
+                "id": conversationId,
+                "other_user_email": safeEmail,
+                "other_user_name": "Self",
+                "latest_message": [
+                    "date": dateString,
+                    "latest_message": message,
+                    "is_read": false
+                ]
+            ]
+            
+            // Update recipient conversation entry
+            self?.database.child("\(otherUserEmail)/conversation").observeSingleEvent(of: .value) { [weak self] snapshot in
+                if let singleConversation = snapshot.value as? [String:Any]{
+                    
+                    var newConversation = [[String: Any]]()
+                    newConversation.append(singleConversation)
+                    newConversation.append(recipient_conversation)
+                    
+                    self?.database.child("\(otherUserEmail)/conversation").setValue(newConversation)
+                    
+                } else if var multipleConversations = snapshot.value as? [[String: Any]] {
+                    
+                    multipleConversations.append(recipient_conversation)
+                    self?.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations)
+                    
+                } else {
+                    
+                    self?.database.child("\(otherUserEmail)/conversation").setValue(recipient_conversation)
+                    
+                }
+            }
+            
+            
+            // Update current user conversation entry
             if let  singleConversation = userNode["conversation"] as? [String: Any] {
                 
                 // User has only one conversation
@@ -397,7 +432,71 @@ extension DatabaseManager {
     }
     
     /// Gets all messages for given conversation
-    public func getAllMessagesFromConversation(with id: String, completion: @escaping(Result<String, Error>) -> Void){
+    public func getAllMessagesFromConversation(with id: String, completion: @escaping(Result<[Message], Error>) -> Void){
+        
+        database.child("\(id)/messages").observe(.value) { snapshot in
+            
+            if let singleValue = snapshot.value as? [String: Any] {
+                
+                guard let content = singleValue["content"] as? String,
+                      let dateString = singleValue["date"] as? String,
+                      let id = singleValue["id"] as? String,
+                      let isRead = singleValue["is_read"] as? Bool,
+                      let otherUserName = singleValue["other_user_name"] as? String,
+                      let senderEmail = singleValue["sender_email"] as? String,
+                      let type = singleValue["type"] as? String,
+                      let date = ChatViewController.dateFormatter.date(from: dateString)
+                else {
+                    return
+                }
+                
+                let sender = Sender(photoURL: "",
+                                    senderId: senderEmail,
+                                    displayName: otherUserName)
+                    
+                let singleMessage = Message(sender: sender,
+                                            messageId: id,
+                                            sentDate: date,
+                                            kind: .text(content))
+                
+                
+                var messages = [Message]()
+                messages.append(singleMessage)
+                completion(.success(messages))
+                
+                      
+            } else if let multipleValues = snapshot.value as? [[String: Any]] {
+                
+                let messages: [Message] = multipleValues.compactMap { collection in
+                    
+                    guard let content = collection["content"] as? String,
+                          let dateString = collection["date"] as? String,
+                          let id = collection["id"] as? String,
+                          let isRead = collection["is_read"] as? Bool,
+                          let otherUserName = collection["other_user_name"] as? String,
+                          let senderEmail = collection["sender_email"] as? String,
+                          let type = collection["type"] as? String,
+                          let date = ChatViewController.dateFormatter.date(from: dateString) else {
+                              return nil
+                          }
+                    
+                    let sender = Sender(photoURL: "",
+                                        senderId: senderEmail,
+                                        displayName: otherUserName)
+                        
+                    return Message(sender: sender,
+                                   messageId: id,
+                                   sentDate: date,
+                                   kind: .text(content))
+                }
+                
+                completion(.success(messages))
+                
+            } else {
+                completion(.failure(FetchError.failedToFetchUsers))
+            }
+            
+        }
         
     }
     

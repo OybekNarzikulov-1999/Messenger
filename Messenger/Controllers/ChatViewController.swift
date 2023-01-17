@@ -64,6 +64,7 @@ class ChatViewController: MessagesViewController {
     }()
     
     private var otherUserEmail: String
+    private var conversationId: String?
     public var isNewConversation = false
     
     var messages = [Message]()
@@ -77,15 +78,20 @@ class ChatViewController: MessagesViewController {
         
         return Sender(photoURL: "",
                senderId: safeEmail,
-               displayName: "Oybek")
+               displayName: "Me")
     }
     
     
     // MARK: - Lifecycle
     
-    init(with email: String) {
+    init(with email: String, id: String?) {
         self.otherUserEmail = email
+        self.conversationId = id
         super.init(nibName: nil, bundle: nil)
+        
+        if let conversationId = conversationId {
+            listenForMessages(id: conversationId)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -106,6 +112,27 @@ class ChatViewController: MessagesViewController {
     
     
     // MARK: - Helper Methods
+    
+    private func listenForMessages(id: String){
+        
+        DatabaseManager.shared.getAllMessagesFromConversation(with: id) { [weak self] result in
+            switch result {
+            case .success(let messages):
+                guard !messages.isEmpty else {
+                    return
+                }
+                
+                self?.messages = messages
+                
+                DispatchQueue.main.async {
+                    self?.messagesCollectionView.reloadDataAndKeepOffset()
+                }
+            case .failure(let error):
+                print("Error While Fetch All Messages For Conversation: \(error)")
+            }
+        }
+        
+    }
 
 }
 
@@ -167,7 +194,6 @@ extension ChatViewController: MessagesDisplayDelegate, MessagesDataSource, Messa
             return sender
         }
         fatalError("Self sender is nil, email is not cached ")
-        return Sender(photoURL: "", senderId: "12321", displayName: "")
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
