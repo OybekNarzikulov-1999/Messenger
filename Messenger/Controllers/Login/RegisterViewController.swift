@@ -229,6 +229,7 @@ class RegisterViewController: UIViewController {
         spinner.show(in: view)
         
         UserDefaults.standard.set(email, forKey: "email")
+        UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
         
         // Firebase register
         DatabaseManager.shared.userExists(withEmail: email) { [weak self] exist in
