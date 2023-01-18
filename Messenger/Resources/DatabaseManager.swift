@@ -502,7 +502,7 @@ extension DatabaseManager {
     }
     
     /// Sends a message to target conversation 
-    public func sendMessage(to conversation: String, otherUserName: String, newMessage: Message, completion: @escaping(Bool) -> Void){
+    public func sendMessage(to conversation: String, otherUserEmail: String, otherUserName: String, newMessage: Message, completion: @escaping(Bool) -> Void){
         
         // Add new message to messages
         // Update last message for sender
@@ -566,7 +566,8 @@ extension DatabaseManager {
                         completion(false)
                         return
                     }
-                    completion(true)
+                    
+                    self?.updateLatestMessageForRecipient(otherUserEmail: otherUserEmail, conversation: conversation, dateString: dateString, message: message, completion: completion)
                 })
                 
             } else if var multipleMessages = snapshot.value as? [[String:Any]] {
@@ -578,7 +579,7 @@ extension DatabaseManager {
                         completion(false)
                         return
                     }
-                    completion(true)
+                    self?.updateLatestMessageForRecipient(otherUserEmail: otherUserEmail, conversation: conversation, dateString: dateString, message: message, completion: completion)
                 })
                 
             } else {
@@ -586,9 +587,147 @@ extension DatabaseManager {
                 return
             }
         }
+    }
+    
+    private func updateLatestMessageForRecipient(otherUserEmail: String, conversation: String, dateString: String, message: String, completion: @escaping (Bool) -> Void) {
+        
+        // Update Latest Message for Recipient
+        self.database.child("\(otherUserEmail)/conversation").observeSingleEvent(of: .value, with: { snapshot in
+            if var onlyOneConversation = snapshot.value as? [String: Any] {
+                guard onlyOneConversation["id"] as? String == conversation else {
+                    completion(false)
+                    return
+                }
+                let newLatestMessage: [String:Any] = [
+                    "date": dateString,
+                    "is_read": false,
+                    "latest_message": message
+                ]
+                onlyOneConversation["latest_message"] = newLatestMessage
+                self.database.child("\(otherUserEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    
+                    // Update Latest Message for Current User
+                    self.updateLatestMessageForCurrentUser(conversation: conversation, dateString: dateString, message: message, completion: completion)
+
+                })
+            } else if var multipleConversations = snapshot.value as? [[String: Any]] {
+                
+                let newLatestMessage: [String:Any] = [
+                    "date": dateString,
+                    "is_read": false,
+                    "latest_message": message
+                ]
+                
+                var newLastConver: [String: Any]?
+                var number = 0
+                
+                for loopConversation in multipleConversations {
+                    if loopConversation["id"] as? String == conversation {
+                        newLastConver = loopConversation
+                        break
+                    }
+                    number += 1
+                }
+                
+                newLastConver?["latest_message"] = newLatestMessage
+                guard let finalConversation = newLastConver else {
+                    completion(false)
+                    return
+                }
+                
+                multipleConversations[number] = finalConversation
+                
+                self.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    
+                    // Update Latest Message for Current User
+                    self.updateLatestMessageForCurrentUser(conversation: conversation, dateString: dateString, message: message, completion: completion)
+                    
+                })
+                
+            } else {
+                completion(false)
+                return
+            }
+        })
+    }
+    
+    private func updateLatestMessageForCurrentUser(conversation: String, dateString: String, message: String, completion: @escaping(Bool) -> Void){
+        
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        self.database.child("\(safeEmail)/conversation").observeSingleEvent(of: .value, with: { snapshot in
+            if var onlyOneConversation = snapshot.value as? [String: Any] {
+                guard onlyOneConversation["id"] as? String == conversation else {
+                    completion(false)
+                    return
+                }
+                let newLatestMessage: [String:Any] = [
+                    "date": dateString,
+                    "is_read": false,
+                    "latest_message": message
+                ]
+                onlyOneConversation["latest_message"] = newLatestMessage
+                self.database.child("\(safeEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                })
+            } else if var multipleConversations = snapshot.value as? [[String: Any]] {
+                
+                let newLatestMessage: [String:Any] = [
+                    "date": dateString,
+                    "is_read": false,
+                    "latest_message": message
+                ]
+                
+                var newLastConver: [String: Any]?
+                var number = 0
+                
+                for loopConversation in multipleConversations {
+                    if loopConversation["id"] as? String == conversation {
+                        newLastConver = loopConversation
+                        break
+                    }
+                    number += 1
+                }
+                
+                newLastConver?["latest_message"] = newLatestMessage
+                guard let finalConversation = newLastConver else {
+                    completion(false)
+                    return
+                }
+                
+                multipleConversations[number] = finalConversation
+                
+                self.database.child("\(safeEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                })
+                
+            } else {
+                completion(false)
+                return
+            }
+        })
         
     }
     
 }
+
+
 
 
