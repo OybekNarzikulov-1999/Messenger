@@ -121,8 +121,8 @@
 				EA07E5BB29334C63006CD6DF /* ConversationsViewController.swift */,
 				EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */,
 				EABCE7D9293F7B31001AB327 /* ChatViewController.swift */,
-				EA07E5D529334F36006CD6DF /* ProfileViewController.swift */,
 				EA07E5D729334F50006CD6DF /* PhotoViewerViewController.swift */,
+				EA07E5D529334F36006CD6DF /* ProfileViewController.swift */,
 				EA07E5D929334F5D006CD6DF /* VideoPlayerViewController.swift */,
 				EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */,
 			);
