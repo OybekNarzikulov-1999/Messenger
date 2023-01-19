@@ -8,17 +8,15 @@
 import UIKit
 import JGProgressHUD
 
-private let reuseID = "Cell"
-
 class NewConversationViewController: UIViewController {
     
     // MARK: - Properties
     
     private var users = [[String: String]]()
-    private var results = [[String: String]]()
+    private var results = [SearchResult]()
     private var hasFetched = false
     
-    public var completion: (([String: String]) -> Void)?
+    public var completion: ((SearchResult) -> Void)?
     
     private let spinner = JGProgressHUD(style: .dark)
     
@@ -33,7 +31,8 @@ class NewConversationViewController: UIViewController {
     private let tableView: UITableView = {
        
         let tableView = UITableView()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: reuseID)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        tableView.register(NewConversationTableViewCell.self, forCellReuseIdentifier: NewConversationTableViewCell.identifier)
         tableView.isHidden = true
         return tableView
         
@@ -94,8 +93,9 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: reuseID, for: indexPath)
-        cell.textLabel?.text = results[indexPath.row]["name"]
+        let model = results[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: NewConversationTableViewCell.identifier, for: indexPath) as! NewConversationTableViewCell
+        cell.configure(with: model)
         return cell
     }
     
@@ -106,6 +106,10 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
         self.dismiss(animated: true) {
             self.completion?(selectedUser)
         }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 56
     }
 }
 
@@ -159,12 +163,22 @@ extension NewConversationViewController: UISearchBarDelegate {
             return
         }
         
-        let results: [[String: String]] = self.users.filter({
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        let results: [SearchResult] = self.users.filter({
+            guard safeEmail != $0["email"] else {return false}
+            
             guard let name = $0["name"]?.lowercased() else {
                 return false
             }
             return name.hasPrefix(term.lowercased())
-        })
+        }).compactMap { element in
+            
+            guard let name = element["name"], let email = element["email"] else {return nil}
+            
+            return SearchResult(name: name, email: email)
+        }
         
         self.results = results
         updateUI()
@@ -185,4 +199,10 @@ extension NewConversationViewController: UISearchBarDelegate {
         }
         
     }
+}
+
+
+struct SearchResult {
+    let name: String
+    let email: String
 }

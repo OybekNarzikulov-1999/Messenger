@@ -30,6 +30,8 @@ class ConversationsViewController: UIViewController {
     
     private var conversations = [Conversation]()
     
+    private var loginObserver: NSObjectProtocol?
+    
     private let tableView: UITableView = {
        
         let tableView = UITableView()
@@ -63,6 +65,14 @@ class ConversationsViewController: UIViewController {
         
         startListeningForConversations()
         
+//        loginObserver = NotificationCenter.default.addObserver(forName: .didLogInNotification, object: nil, queue: .main, using: { [weak self] _ in
+//
+//            guard let strongSelf = self else {return}
+//
+//            strongSelf.startListeningForConversations()
+//
+//        })
+        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapComposeButton))
     }
     
@@ -78,14 +88,15 @@ class ConversationsViewController: UIViewController {
     
     @objc private func didTapComposeButton(){
         let vc = NewConversationViewController()
-        vc.completion = {result in
+        vc.completion = { [weak self] result in
             
-            guard let name = result["name"], let email = result["email"] else {return}
+            let name = result.name
+            let email = result.email
             let vc = ChatViewController(with: email, id: nil)
             vc.isNewConversation = true
             vc.title = name
             vc.navigationItem.largeTitleDisplayMode = .never
-            self.navigationController?.pushViewController(vc, animated: true)
+            self?.navigationController?.pushViewController(vc, animated: true)
         }
         let nav = UINavigationController(rootViewController: vc)
         present(nav, animated: true)
@@ -135,6 +146,10 @@ class ConversationsViewController: UIViewController {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         
+//        if let observer = loginObserver {
+//            NotificationCenter.default.removeObserver(observer)
+//        }
+        
         DatabaseManager.shared.getAllConversations(for: safeEmail) { [weak self] result in
             switch result {
             case .success(let conversations):
@@ -183,6 +198,34 @@ extension ConversationsViewController: UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if editingStyle == .delete {
+            let conversationId = conversations[indexPath.row].id
+            // begin delete
+            tableView.beginUpdates()
+            
+            conversations.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .left)
+            
+            DatabaseManager.shared.deleteConversation(with: conversationId) { [weak self] success in
+                if success {
+                    print("Successfully delete conversation")
+                } else {
+                    print("Error when delete conversation")
+                }
+            }
+            
+            tableView.endUpdates()
+        
+        }
+        
     }
     
 }

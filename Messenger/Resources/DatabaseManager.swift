@@ -130,6 +130,72 @@ final class DatabaseManager {
     }
 }
 
+extension DatabaseManager {
+    
+    public func deleteConversation(with conversationId: String, completion: @escaping (Bool) -> Void) {
+        
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        let ref = database.child("\(safeEmail)/conversation")
+        
+        ref.observeSingleEvent(of: .value) { snapshot in
+            
+            if let singleValue = snapshot.value as? [String: Any] {
+                
+                guard singleValue["id"] as? String == conversationId else {
+                    completion(false)
+                    print("ConversationId don't match with single conversation")
+                    return
+                }
+                
+                let newCollection = [String: Any]()
+                
+                ref.setValue(newCollection) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        print("Can't set value after deletion")
+                        return
+                    }
+                    print("DEBUG: Conversation Deleted")
+                    completion(true)
+                }
+                
+            } else if var multipleValues = snapshot.value as? [[String:Any]] {
+                
+                var positionToRemove = 0
+                for value in multipleValues {
+                    if value["id"] as? String == conversationId {
+                        print("Found conversation for delete")
+                        break
+                    }
+                    positionToRemove += 1
+                }
+                
+                multipleValues.remove(at: positionToRemove)
+                
+                ref.setValue(multipleValues) { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        print("Can't set value after deletion")
+                        return
+                    }
+                    print("DEBUG: Conversation Deleted")
+                    completion(true)
+                }
+                
+            } else {
+                completion(false)
+                print("Can't observe values")
+                return
+            }
+
+        }
+        
+    }
+    
+}
+
 
 // MARK: - Sending Messages / Conversations
 extension DatabaseManager {
@@ -147,7 +213,6 @@ extension DatabaseManager {
     ]
     
     */
-    
     
     /// Create a new conversation with target user email and new message
     public func createNewConversation(with otherUserEmail: String, otherUserName: String, firstMessage: Message, completion: @escaping(Bool) -> Void){
@@ -466,6 +531,14 @@ extension DatabaseManager {
                                       size: CGSize(width: 300, height: 300))
                     kind = .photo(media)
                     
+                } else if type == "video" {
+                    
+                    guard let url = URL(string: content), let placeholder = UIImage(named: "video_placeholder") else {return}
+                    let media = Media(url: url,
+                                      image: nil,
+                                      placeholderImage: placeholder,
+                                      size: CGSize(width: 300, height: 300))
+                    kind = .video(media)
                 } else {
                     kind = .text(content)
                 }
@@ -511,6 +584,15 @@ extension DatabaseManager {
                                           placeholderImage: placeholder,
                                           size: CGSize(width: 300, height: 300))
                         kind = .photo(media)
+                        
+                    } else if type == "video" {
+                        
+                        guard let url = URL(string: content), let placeholder = UIImage(named: "video_placeholder") else {return nil }
+                        let media = Media(url: url,
+                                          image: nil,
+                                          placeholderImage: placeholder,
+                                          size: CGSize(width: 300, height: 300))
+                        kind = .video(media)
                         
                     } else {
                         kind = .text(content)
@@ -564,7 +646,10 @@ extension DatabaseManager {
                     message = targetUrlString
                 }
                 break
-            case .video(_):
+            case .video(let mediaItem):
+                if let targetUrlString = mediaItem.url?.absoluteString {
+                    message = targetUrlString
+                }
                 break
             case .location(_):
                 break
