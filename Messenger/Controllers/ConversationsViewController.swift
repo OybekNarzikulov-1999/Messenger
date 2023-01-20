@@ -90,19 +90,53 @@ class ConversationsViewController: UIViewController {
         let vc = NewConversationViewController()
         vc.completion = { [weak self] result in
             
-            let name = result.name
-            let email = result.email
-            let vc = ChatViewController(with: email, id: nil)
-            vc.isNewConversation = true
-            vc.title = name
-            vc.navigationItem.largeTitleDisplayMode = .never
-            self?.navigationController?.pushViewController(vc, animated: true)
+            let currentConversations = self?.conversations
+            
+            if let targetConversation = currentConversations?.first(where: { conversation in
+                conversation.otherUserEmail == DatabaseManager.safeEmail(emailAddress: result.email)
+            }) {
+                let vc = ChatViewController(with: targetConversation.otherUserEmail, id: targetConversation.id)
+                vc.isNewConversation = false
+                vc.title = targetConversation.otherUserName
+                vc.navigationItem.largeTitleDisplayMode = .never
+                self?.navigationController?.pushViewController(vc, animated: true)
+            } else {
+                self?.createNewConversation(result: result)
+            }
         }
         let nav = UINavigationController(rootViewController: vc)
         present(nav, animated: true)
     }
     
     // MARK: - Helper Methods
+    
+    public func createNewConversation(result: SearchResult) {
+        
+        let name = result.name
+        let email = DatabaseManager.safeEmail(emailAddress: result.email)
+        
+        // Check in database if conversation between two users exist
+        // If it does, reuse conversation id
+        // Otherwise use exisiting code
+        
+        DatabaseManager.shared.conversationExists(with: email) { result in
+            switch result {
+            case .success(let conversationId):
+                let vc = ChatViewController(with: email, id: conversationId)
+                vc.isNewConversation = false
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                self.navigationController?.pushViewController(vc, animated: true)
+            case .failure(_):
+                let vc = ChatViewController(with: email, id: nil)
+                vc.isNewConversation = true
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        
+    }
     
     private func configureNavigationBar(){
         if #available(iOS 13.0, *) {
