@@ -10,6 +10,7 @@ import MessageKit
 import InputBarAccessoryView
 import SDWebImage
 import AVKit
+import CoreLocation
 
 struct Message: MessageType {
     var sender: SenderType
@@ -55,6 +56,11 @@ struct Media: MediaItem {
     var url: URL?
     var image: UIImage?
     var placeholderImage: UIImage
+    var size: CGSize
+}
+
+struct Location: LocationItem {
+    var location: CLLocation
     var size: CGSize
 }
 
@@ -148,9 +154,54 @@ class ChatViewController: MessagesViewController {
         actionSheet.addAction(UIAlertAction(title: "Audio", style: .default, handler: { _ in
             
         }))
+        actionSheet.addAction(UIAlertAction(title: "Location", style: .default, handler: { [weak self] _ in
+            self?.presentLocationPicker()
+        }))
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         present(actionSheet, animated: true)
+    }
+    
+    private func presentLocationPicker(){
+        
+        guard let messageId = createMessageId(),
+              let conversationId = conversationId,
+              let otherUserName = self.title,
+              let selfSender = selfSender
+        else {
+            return
+        }
+        
+        let vc = LocationPickerViewController(coordinates: nil, isPickable: true)
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.title = "Pick Location"
+        vc.hidesBottomBarWhenPushed = true
+        vc.completion = { selectedCoordinates in
+            
+            let longitude: Double = selectedCoordinates.longitude
+            let latitude: Double = selectedCoordinates.latitude
+            
+            print("long: \(longitude)")
+            print("lat: \(latitude)")
+            
+            let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
+                                    size: .zero)
+            
+            let message = Message(sender: selfSender,
+                                  messageId: messageId,
+                                  sentDate: Date(),
+                                  kind: .location(location))
+            
+            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: self.otherUserEmail, otherUserName: otherUserName, newMessage: message) { success in
+                if success {
+                    print("sent location message")
+                } else {
+                    print("Failed to send a location message")
+                }
+            }
+            
+        }
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     private func presentPhotoInputActionSheet(){
@@ -278,7 +329,7 @@ extension ChatViewController: UIImagePickerControllerDelegate, UINavigationContr
                     
                     DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, otherUserName: otherUserName, newMessage: message) { success in
                         if success {
-                            print("sent photo messag e")
+                            print("sent photo message")
                         } else {
                             print("Failed to send a message")
                         }
@@ -434,6 +485,23 @@ extension ChatViewController: MessagesDisplayDelegate, MessagesDataSource, Messa
 }
 
 extension ChatViewController: MessageCellDelegate {
+    
+    func didTapMessage(in cell: MessageCollectionViewCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for: cell) else {return}
+        let message = messages[indexPath.section]
+        
+        switch message.kind {
+        case .location(let locationItem):
+            let coordinates = locationItem.location.coordinate
+            let vc = LocationPickerViewController(coordinates: coordinates, isPickable: false)
+            vc.title = "Location"
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
+            
+        default:
+            break
+        }
+    }
     
     func didTapImage(in cell: MessageCollectionViewCell) {
         

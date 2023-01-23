@@ -24,6 +24,7 @@
 		EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */; };
 		EA07E5DF29376CFF006CD6DF /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA07E5DE29376CFF006CD6DF /* Extensions.swift */; };
 		EA07E5E129379014006CD6DF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA07E5E029379014006CD6DF /* GoogleService-Info.plist */; };
+		EA344D75297ECABB0059E212 /* LocationPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA344D74297ECABB0059E212 /* LocationPickerViewController.swift */; };
 		EA377B8929797A1C00610518 /* NewConversationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA377B8829797A1C00610518 /* NewConversationTableViewCell.swift */; };
 		EA4427FF2938D6CF003F9C1C /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */; };
 		EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABCE7D9293F7B31001AB327 /* ChatViewController.swift */; };
@@ -53,6 +54,7 @@
 		EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
 		EA07E5DE29376CFF006CD6DF /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		EA07E5E029379014006CD6DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		EA344D74297ECABB0059E212 /* LocationPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerViewController.swift; sourceTree = "<group>"; };
 		EA377B8829797A1C00610518 /* NewConversationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationTableViewCell.swift; sourceTree = "<group>"; };
 		EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		EA4428002938E77C003F9C1C /* Messenger.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Messenger.entitlements; sourceTree = "<group>"; };
@@ -124,8 +126,9 @@
 				EA07E5DB29334F6C006CD6DF /* NewConversationViewController.swift */,
 				EABCE7D9293F7B31001AB327 /* ChatViewController.swift */,
 				EA07E5D729334F50006CD6DF /* PhotoViewerViewController.swift */,
-				EA07E5D529334F36006CD6DF /* ProfileViewController.swift */,
 				EA07E5D929334F5D006CD6DF /* VideoPlayerViewController.swift */,
+				EA344D74297ECABB0059E212 /* LocationPickerViewController.swift */,
+				EA07E5D529334F36006CD6DF /* ProfileViewController.swift */,
 				EA4427FE2938D6CF003F9C1C /* TabBarViewController.swift */,
 			);
 			path = Controllers;
@@ -316,6 +319,7 @@
 				EAF2C6F3296B2D16004B4108 /* Constants.swift in Sources */,
 				EA07E5DF29376CFF006CD6DF /* Extensions.swift in Sources */,
 				EA07E5DA29334F5D006CD6DF /* VideoPlayerViewController.swift in Sources */,
+				EA344D75297ECABB0059E212 /* LocationPickerViewController.swift in Sources */,
 				EA07E5DC29334F6C006CD6DF /* NewConversationViewController.swift in Sources */,
 				EABCE7DA293F7B31001AB327 /* ChatViewController.swift in Sources */,
 				EAF2C6F529705DFA004B4108 /* ConversationTableViewCell.swift in Sources */,

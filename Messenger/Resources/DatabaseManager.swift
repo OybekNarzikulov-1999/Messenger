@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseDatabase
 import MessageKit
+import CoreLocation
 
 final class DatabaseManager {
     
@@ -472,6 +473,15 @@ extension DatabaseManager {
                                       placeholderImage: placeholder,
                                       size: CGSize(width: 300, height: 300))
                     kind = .video(media)
+                } else if type == "location" {
+                    
+                    let locationCoordinates = content.components(separatedBy: ",")
+                    guard let long = Double(locationCoordinates[0]), let lat = Double(locationCoordinates[1]) else {return}
+                    
+                    let location = Location(location: CLLocation(latitude: lat, longitude: long) ,
+                                            size: CGSize(width: 300, height: 300))
+                    
+                    kind = .location(location)
                 } else {
                     kind = .text(content)
                 }
@@ -527,6 +537,15 @@ extension DatabaseManager {
                                           size: CGSize(width: 300, height: 300))
                         kind = .video(media)
                         
+                    } else if type == "location" {
+                        
+                        let locationCoordinates = content.components(separatedBy: ",")
+                        guard let long = Double(locationCoordinates[0]), let lat = Double(locationCoordinates[1]) else {return nil}
+                        
+                        let location = Location(location: CLLocation(latitude: lat, longitude: long) ,
+                                                size: CGSize(width: 300, height: 300))
+                        
+                        kind = .location(location)
                     } else {
                         kind = .text(content)
                     }
@@ -584,7 +603,9 @@ extension DatabaseManager {
                     message = targetUrlString
                 }
                 break
-            case .location(_):
+            case .location(let locationItem):
+                let location = locationItem.location
+                message = "\(location.coordinate.longitude),\(location.coordinate.latitude)"
                 break
             case .emoji(_):
                 break
