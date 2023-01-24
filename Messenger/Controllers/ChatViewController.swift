@@ -78,6 +78,9 @@ class ChatViewController: MessagesViewController {
         
     }()
     
+    private var selfPhotoUrl: URL?
+    private var otherUserPhotoUrl: URL?
+    
     private var otherUserEmail: String
     private var conversationId: String?
     public var isNewConversation = false
@@ -411,6 +414,10 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
                 if success {
                     print("Message sent")
                     self?.isNewConversation = false
+                    self?.conversationId = "conversation_\(message.messageId)"
+                    guard let newConversationId = self?.conversationId else {return}
+                    self?.listenForMessages(id: newConversationId)
+                    self?.messageInputBar.inputTextView.text = nil
                 } else {
                     print("Failed to sent")
                 }
@@ -420,9 +427,10 @@ extension ChatViewController: InputBarAccessoryViewDelegate {
             guard let conversationId = conversationId,
                   let name = self.title else {return}
             // Append message to existing conversation data
-            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: otherUserEmail, otherUserName: name, newMessage: message) { success in
+            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: otherUserEmail, otherUserName: name, newMessage: message) { [weak self] success in
                 if success {
                     print("Message sent")
+                    self?.messageInputBar.inputTextView.text = nil
                     
                 } else {
                     print("Failed to sent")
@@ -478,6 +486,61 @@ extension ChatViewController: MessagesDisplayDelegate, MessagesDataSource, Messa
             
         default:
             break
+        }
+    }
+    
+    func backgroundColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        
+        if message.sender.senderId != selfSender?.senderId {
+            return .secondarySystemBackground
+        }
+        return .link
+    }
+    
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        
+        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        if message.sender.senderId == selfSender?.senderId {
+            
+            if let selfPhoto = selfPhotoUrl {
+                avatarView.sd_setImage(with: selfPhoto, completed: nil)
+            } else {
+                let path = "images/\(safeEmail)_profile_picture.png"
+                StorageManager.shared.downloadURL(for: path) { [weak self] result in
+                    switch result {
+                    case .success(let url):
+                        self?.selfPhotoUrl = url
+                        DispatchQueue.main.async {
+                            avatarView.sd_setImage(with: url, completed: nil)
+                        }
+                    case .failure(let error):
+                        print("\(error)")
+                    }
+                }
+            }
+            
+        } else {
+            let otherUserSafeEmail = DatabaseManager.safeEmail(emailAddress: otherUserEmail)
+            
+            if let otherPhoto = otherUserPhotoUrl {
+                avatarView.sd_setImage(with: otherPhoto, completed: nil)
+            } else {
+                let path = "images/\(otherUserSafeEmail)_profile_picture.png"
+                StorageManager.shared.downloadURL(for: path) { [weak self] result in
+                    switch result {
+                    case .success(let url):
+                        self?.otherUserPhotoUrl = url
+                        DispatchQueue.main.async {
+                            avatarView.sd_setImage(with: url, completed: nil)
+                        }
+                    case .failure(let error):
+                        print("\(error)")
+                    }
+                }
+            }
+            
         }
         
     }

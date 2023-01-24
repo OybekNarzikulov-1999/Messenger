@@ -60,7 +60,6 @@ class ConversationsViewController: UIViewController {
         view.backgroundColor = .white
         view.addSubview(noConversationsLabel)
         configureTableView()
-        fetchConversations()
         configureNavigationBar()
         
         startListeningForConversations()
@@ -82,6 +81,7 @@ class ConversationsViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         tableView.frame = view.bounds
+        noConversationsLabel.frame = CGRect(x: 10, y: (view.frame.height - 100) / 2, width: view.frame.width - 20, height: 100)
     }
     
     // MARK: - Selectors
@@ -171,10 +171,6 @@ class ConversationsViewController: UIViewController {
         }
     }
     
-    private func fetchConversations(){
-        tableView.isHidden = false
-    }
-    
     private func startListeningForConversations(){
         
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
@@ -188,8 +184,12 @@ class ConversationsViewController: UIViewController {
             switch result {
             case .success(let conversations):
                 guard !conversations.isEmpty else {
+                    self?.tableView.isHidden = true
+                    self?.noConversationsLabel.isHidden = false
                     return
                 }
+                self?.noConversationsLabel.isHidden = true
+                self?.tableView.isHidden = false
                 self?.conversations = conversations
                 
                 DispatchQueue.main.async {
@@ -197,6 +197,8 @@ class ConversationsViewController: UIViewController {
                 }
                 
             case .failure(let error):
+                self?.tableView.isHidden = true
+                self?.noConversationsLabel.isHidden = false
                 print("Failed to fetch conversations: \(error)")
             }
         }
@@ -248,7 +250,7 @@ extension ConversationsViewController: UITableViewDelegate, UITableViewDataSourc
             conversations.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .left)
             
-            DatabaseManager.shared.deleteConversation(with: conversationId) { [weak self] success in
+            DatabaseManager.shared.deleteConversation(with: conversationId) { success in
                 if success {
                     print("Successfully delete conversation")
                 } else {

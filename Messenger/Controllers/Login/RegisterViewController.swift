@@ -228,9 +228,6 @@ class RegisterViewController: UIViewController {
         
         spinner.show(in: view)
         
-        UserDefaults.standard.set(email, forKey: "email")
-        UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
-        
         // Firebase register
         DatabaseManager.shared.userExists(withEmail: email) { [weak self] exist in
             guard let strongSelf = self else {return}
@@ -248,6 +245,9 @@ class RegisterViewController: UIViewController {
                 guard auth != nil, error == nil else {
                     return
                 }
+                
+                UserDefaults.standard.set(email, forKey: "email")
+                UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
                 
                 let chatUser = ChatAppUser(firstName: firstName, lastName: lastName, emailAddress: email)
                 
