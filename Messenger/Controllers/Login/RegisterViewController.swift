@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 import JGProgressHUD
 
-class RegisterViewController: UIViewController {
+final class RegisterViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -213,7 +213,7 @@ class RegisterViewController: UIViewController {
     
     @objc private func registerButtonTapped(){
         
-        self.view.endEditing(true)
+        view.endEditing(true)
         
         guard let firstName = firstNameTextField.text,
               let lastName = secondNameTextField.text,

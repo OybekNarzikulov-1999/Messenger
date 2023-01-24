@@ -13,7 +13,7 @@ import GoogleSignIn
 import FirebaseCore
 import JGProgressHUD
 
-class LoginViewController: UIViewController {
+final class LoginViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -194,7 +194,7 @@ class LoginViewController: UIViewController {
     
     @objc private func loginButtonTapped(){
         
-        self.view.endEditing(true)
+        view.endEditing(true)
         
         guard let email = emailTextField.text,
               let password = passwordTextField.text,
@@ -297,14 +297,14 @@ class LoginViewController: UIViewController {
             guard let authentication = user?.authentication, let idToken = authentication.idToken else {return}
             let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: authentication.accessToken)
             
-            Auth.auth().signIn(with: credential) { authResult, error in
+            Auth.auth().signIn(with: credential) { [weak self] authResult, error in
                 if error != nil {
                     print("Failed to sign in with google")
                     return
                 }
                 // User is signed in
                 print("DEBUG: User logged in")
-                self.navigationController?.dismiss(animated: true, completion: nil)
+                self?.navigationController?.dismiss(animated: true, completion: nil)
             }
         }
     }

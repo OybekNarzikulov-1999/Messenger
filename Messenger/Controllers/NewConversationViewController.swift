@@ -8,7 +8,7 @@
 import UIKit
 import JGProgressHUD
 
-class NewConversationViewController: UIViewController {
+final class NewConversationViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -78,7 +78,7 @@ class NewConversationViewController: UIViewController {
     // MARK: Selectors
     
     @objc private func cancelButtonTapped(){
-        self.dismiss(animated: true)
+        dismiss(animated: true)
     }
     
     // MARK: Helper Methods
@@ -103,8 +103,8 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
          tableView.deselectRow(at: indexPath, animated: true)
         
         let selectedUser = results[indexPath.row]
-        self.dismiss(animated: true) {
-            self.completion?(selectedUser)
+        dismiss(animated: true) { [weak self] in
+            self?.completion?(selectedUser)
         }
     }
     
@@ -125,10 +125,10 @@ extension NewConversationViewController: UISearchBarDelegate {
         
         searchBar.resignFirstResponder()
         
-        self.spinner.show(in: view)
+        spinner.show(in: view)
         
-        self.results.removeAll()
-        self.searchUsers(query: text)
+        results.removeAll()
+        searchUsers(query: text)
     }
     
     func searchUsers(query: String){
@@ -157,7 +157,7 @@ extension NewConversationViewController: UISearchBarDelegate {
     
     func filterUsers(with term: String ){
         
-        self.spinner.dismiss(animated: true)
+        spinner.dismiss(animated: true)
         
         guard hasFetched else {
             return
@@ -166,7 +166,7 @@ extension NewConversationViewController: UISearchBarDelegate {
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         
-        let results: [SearchResult] = self.users.filter({
+        let results: [SearchResult] = users.filter({
             guard safeEmail != $0["email"] else {return false}
             
             guard let name = $0["name"]?.lowercased() else {
@@ -186,23 +186,18 @@ extension NewConversationViewController: UISearchBarDelegate {
     
     func updateUI(){
         
-        if self.results.isEmpty {
+        if results.isEmpty {
             
-            self.tableView.isHidden = true
-            self.noResultsLabel.isHidden = false
+            tableView.isHidden = true
+            noResultsLabel.isHidden = false
             
         } else {
             
-            self.tableView.isHidden = false
-            self.noResultsLabel.isHidden = true
-            self.tableView.reloadData()
+            tableView.isHidden = false
+            noResultsLabel.isHidden = true
+            tableView.reloadData()
         }
         
     }
 }
 
-
-struct SearchResult {
-    let name: String
-    let email: String
-}

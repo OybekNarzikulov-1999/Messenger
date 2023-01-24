@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class PhotoViewerViewController: UIViewController {
+final class PhotoViewerViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -45,8 +45,4 @@ class PhotoViewerViewController: UIViewController {
         super.viewDidLayoutSubviews()
         imageView.frame = view.bounds
     }
-    
-    // MARK: - Helper Methods
-    
-    
 }

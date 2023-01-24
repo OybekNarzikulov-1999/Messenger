@@ -9,7 +9,7 @@ import UIKit
 import CoreLocation
 import MapKit
 
-class LocationPickerViewController: UIViewController {
+final class LocationPickerViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -93,7 +93,5 @@ class LocationPickerViewController: UIViewController {
         map.addAnnotation(annotation)
 
     }
-    
-    // MARK: - Helper methods
     
 }

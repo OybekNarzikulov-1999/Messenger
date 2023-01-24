@@ -21,6 +21,7 @@ extension UIViewController {
 }
 
 extension Notification.Name {
+    /// Notification when the user logs in
     static let didLogInNotification = Notification.Name("didLogInNotification")
 }
 

@@ -9,20 +9,7 @@ import UIKit
 import FirebaseAuth
 import JGProgressHUD
 
-struct Conversation {
-    let id: String
-    let otherUserEmail: String
-    let otherUserName: String
-    let latestMessage: LatestMessage
-}
-
-struct LatestMessage {
-    let date: String
-    let isRead: Bool
-    let text: String
-}
-
-class ConversationsViewController: UIViewController {
+final class ConversationsViewController: UIViewController {
 
     // MARK: -  Properties
     
@@ -119,20 +106,20 @@ class ConversationsViewController: UIViewController {
         // If it does, reuse conversation id
         // Otherwise use exisiting code
         
-        DatabaseManager.shared.conversationExists(with: email) { result in
+        DatabaseManager.shared.conversationExists(with: email) { [weak self] result in
             switch result {
             case .success(let conversationId):
                 let vc = ChatViewController(with: email, id: conversationId)
                 vc.isNewConversation = false
                 vc.title = name
                 vc.navigationItem.largeTitleDisplayMode = .never
-                self.navigationController?.pushViewController(vc, animated: true)
+                self?.navigationController?.pushViewController(vc, animated: true)
             case .failure(_):
                 let vc = ChatViewController(with: email, id: nil)
                 vc.isNewConversation = true
                 vc.title = name
                 vc.navigationItem.largeTitleDisplayMode = .never
-                self.navigationController?.pushViewController(vc, animated: true)
+                self?.navigationController?.pushViewController(vc, animated: true)
             }
         }
         

@@ -10,9 +10,17 @@ import FirebaseDatabase
 import MessageKit
 import CoreLocation
 
+
+/// Manager object to read and write data to real time firebase database
 final class DatabaseManager {
     
+    /// Shared instance of class
     static var shared = DatabaseManager()
+    
+    /// Force to use shared 
+    private init() {}
+    
+    /// Reference to firebase database
     private let database = Database.database().reference()
     
     /// Creates a new user in database if it is not exist or append the user
@@ -20,14 +28,14 @@ final class DatabaseManager {
         let userDict = ["first_name": user.firstName,
                         "last_name": user.lastName]
         
-        database.child(user.safeEmail).setValue(userDict) { error, _ in
+        database.child(user.safeEmail).setValue(userDict) { [weak self] error, _ in
             guard error == nil else {
                 print("failed to store data in firebase database")
                 completion(false)
                 return
             }
             
-            self.database.child("users").observeSingleEvent(of: .value) { snapshot in
+            self?.database.child("users").observeSingleEvent(of: .value) { [weak self] snapshot in
                 if let userCollection = snapshot.value as? [String:String] {
                     // add user to collection and update database
                     let newElement = [
@@ -37,7 +45,7 @@ final class DatabaseManager {
                     var newCollection = [[String:String]]()
                     newCollection.append(userCollection)
                     newCollection.append(newElement)
-                    self.database.child("users").setValue(newCollection) { error, _ in
+                    self?.database.child("users").setValue(newCollection) { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -52,7 +60,7 @@ final class DatabaseManager {
                     ]
                     
                     usersCollection.append(newElement)
-                    self.database.child("users").setValue(usersCollection) { error, _ in
+                    self?.database.child("users").setValue(usersCollection) { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -66,7 +74,7 @@ final class DatabaseManager {
                         "name": user.firstName + " " + user.lastName,
                         "email":user.safeEmail
                     ]
-                    self.database.child("users").setValue(newCollection) { error, _ in
+                    self?.database.child("users").setValue(newCollection) { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -78,7 +86,10 @@ final class DatabaseManager {
         }
     }
     
-    /// Checks does user exist in db
+    /// Checks if user exists for given email
+    /// Parameters
+    /// - `email`:              Target email to be checked
+    /// - `completion`:   Async closure to be return with result
     public func userExists(withEmail email: String, completion: @escaping((Bool) -> Void)){
         
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
@@ -92,7 +103,6 @@ final class DatabaseManager {
         }
     }
     
-    
     /// Converts email into safeEmail
     static func safeEmail(emailAddress: String) -> String {
         var email = emailAddress.replacingOccurrences(of: ".", with: "-")
@@ -100,9 +110,9 @@ final class DatabaseManager {
         return email
     }
     
-    /// Fetchs all users from db
+    /// Fetchs all users from firebase database
     public func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void){
-        self.database.child("users").observeSingleEvent(of: .value) { snapshot in
+        database.child("users").observeSingleEvent(of: .value) { snapshot in
             if let _ = snapshot.value as? [String: String] {
                 completion(.failure(FetchError.failedToFetchUsers))
             } else if let users = snapshot.value as? [[String: String]]{
@@ -112,44 +122,51 @@ final class DatabaseManager {
         
     }
     
+    /// Returns dictionary node at child path
     public func getDataFor(path: String, completion: @escaping (Result<[String:Any], Error>) -> Void) {
-        
-        self.database.child(path).observeSingleEvent(of: .value) { snapshot in
+        database.child(path).observeSingleEvent(of: .value) { snapshot in
             guard let value = snapshot.value as? [String: Any] else {
                 completion(.failure(FetchError.failedToFetchUsers))
                 return
             }
             completion(.success(value))
         }
-        
     }
     
     // Errors enum
     public enum FetchError: Error {
         case failedToFetchUsers
+        
+//        public var description: String {
+//            switch self {
+//            case .failedToFetchUsers:
+//                return "failedToFetchUsers"
+//            }
+//        }
     }
+    
 }
 
 
 // MARK: - Sending Messages / Conversations
 extension DatabaseManager {
     
-   /*
-    
-    "conversation" [
-        "conversation_id": "foewnfewnfon"
-        "other_user_email": String
-        "latest_message": {
-            "date": Date
-            "latest_message": Message
-            "is_read": Bool
-        }
-    ]
-    
-    */
-    
     /// Create a new conversation with target user email and new message
     public func createNewConversation(with otherUserEmail: String, otherUserName: String, firstMessage: Message, completion: @escaping(Bool) -> Void){
+        
+        /*
+         
+         "conversation" [
+             "conversation_id": "foewnfewnfon"
+             "other_user_email": String
+             "latest_message": {
+                 "date": Date
+                 "latest_message": Message
+                 "is_read": Bool
+             }
+         ]
+         
+         */
         
         guard let email = UserDefaults.standard.value(forKey: "email") as? String,
               let name = UserDefaults.standard.value(forKey: "name") as? String else {
@@ -291,6 +308,7 @@ extension DatabaseManager {
         }
     }
     
+    /// Finishing create new conversation (create message in user node in firebase database)
     private func finishCreatingConversation(conversationId: String, otherUserName: String, firstMessage: Message, completion: @escaping(Bool) -> Void){
         
 //        "foewnfewnfon": {
@@ -663,10 +681,11 @@ extension DatabaseManager {
         }
     }
     
+    /// Update latest message for receiver
     private func updateLatestMessageForRecipient(otherUserEmail: String, otherUserName: String, conversation: String, dateString: String, message: String, completion: @escaping (Bool) -> Void) {
         
         // Update Latest Message for Recipient
-        self.database.child("\(otherUserEmail)/conversation").observeSingleEvent(of: .value, with: { snapshot in
+        database.child("\(otherUserEmail)/conversation").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             
             let newLatestMessage: [String:Any] = [
                 "date": dateString,
@@ -680,14 +699,14 @@ extension DatabaseManager {
                     return
                 }
                 onlyOneConversation["latest_message"] = newLatestMessage
-                self.database.child("\(otherUserEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
+                self?.database.child("\(otherUserEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
                     guard error == nil else {
                         completion(false)
                         return
                     }
                     
                     // Update Latest Message for Current User
-                    self.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
+                    self?.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
 
                 })
             } else if var multipleConversations = snapshot.value as? [[String: Any]] {
@@ -708,14 +727,14 @@ extension DatabaseManager {
                     
                     multipleConversations[number] = newLastConver
                     
-                    self.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
+                    self?.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
                         }
                         
                         // Update Latest Message for Current User
-                        self.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
+                        self?.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
                         
                     })
                 } else {
@@ -733,14 +752,14 @@ extension DatabaseManager {
                     
                     multipleConversations.append(newLastMessage)
                     
-                    self.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
+                    self?.database.child("\(otherUserEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
                         }
                         
                         // Update Latest Message for Current User
-                        self.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
+                        self?.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
                         
                     })
                     
@@ -759,26 +778,27 @@ extension DatabaseManager {
                     "latest_message": newLatestMessage
                 ]
                 
-                self.database.child("\(otherUserEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
+                self?.database.child("\(otherUserEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
                     guard error == nil else {
                         completion(false)
                         return
                     }
                     
                     // Update Latest Message for Current User
-                    self.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
+                    self?.updateLatestMessageForCurrentUser(conversation: conversation, otherUserEmail: otherUserEmail, otherUserName: otherUserName, dateString: dateString, message: message, completion: completion)
                     
                 })
             }
         })
     }
     
+    /// Update latest message for sender
     private func updateLatestMessageForCurrentUser(conversation: String, otherUserEmail: String, otherUserName: String, dateString: String, message: String, completion: @escaping(Bool) -> Void){
         
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
         let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
         
-        self.database.child("\(safeEmail)/conversation").observeSingleEvent(of: .value, with: { snapshot in
+        database.child("\(safeEmail)/conversation").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             
             let newLatestMessage: [String:Any] = [
                 "date": dateString,
@@ -792,7 +812,7 @@ extension DatabaseManager {
                     return
                 }
                 onlyOneConversation["latest_message"] = newLatestMessage
-                self.database.child("\(safeEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
+                self?.database.child("\(safeEmail)/conversation").setValue(onlyOneConversation, withCompletionBlock: { error, _ in
                     guard error == nil else {
                         completion(false)
                         return
@@ -816,7 +836,7 @@ extension DatabaseManager {
                     newLastConver["latest_message"] = newLatestMessage
                     multipleConversations[number] = newLastConver
                     
-                    self.database.child("\(safeEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
+                    self?.database.child("\(safeEmail)/conversation").setValue(multipleConversations, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -833,7 +853,7 @@ extension DatabaseManager {
                         "latest_message": newLatestMessage
                     ]
                     
-                    self.database.child("\(safeEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
+                    self?.database.child("\(safeEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -852,7 +872,7 @@ extension DatabaseManager {
                     "latest_message": newLatestMessage
                 ]
                 
-                self.database.child("\(safeEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
+                self?.database.child("\(safeEmail)/conversation").setValue(newLastMessage, withCompletionBlock: { error, _ in
                     guard error == nil else {
                         completion(false)
                         return
@@ -864,6 +884,7 @@ extension DatabaseManager {
         
     }
     
+    /// Delete conversation for given conversation ID
     public func deleteConversation(with conversationId: String, completion: @escaping (Bool) -> Void) {
         
         guard let email = UserDefaults.standard.value(forKey: "email") as? String else {return}
@@ -926,6 +947,7 @@ extension DatabaseManager {
         
     }
     
+    /// Check if conversation exists or not
     public func conversationExists(with targetRecipientEmail: String, completion: @escaping (Result<String,Error>) -> Void){
         
         let safeRecipientEmail = DatabaseManager.safeEmail(emailAddress: targetRecipientEmail)

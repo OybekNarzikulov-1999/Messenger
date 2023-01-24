@@ -10,19 +10,7 @@ import FirebaseAuth
 import GoogleSignIn
 import SDWebImage
 
-enum ProfileViewModelType {
-    case info, logout
-}
-
-struct ProfileViewModel {
-    let viewModelType: ProfileViewModelType
-    let title: String
-    let completion: (() -> Void)?
-}
-
-private let reuseID = "reuseID"
-
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
     
     // MARK: - Properties
     
@@ -127,9 +115,9 @@ class ProfileViewController: UIViewController {
         let path = "images/\(filename)"
                 
         
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 200))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 200))
         
-        let profileImage = UIImageView(frame: CGRect(x: (self.view.frame.width - 150) / 2, y: 25, width: 150, height: 150))
+        let profileImage = UIImageView(frame: CGRect(x: (view.frame.width - 150) / 2, y: 25, width: 150, height: 150))
         profileImage.layer.cornerRadius = 75
         profileImage.layer.borderColor = UIColor.black.cgColor
         profileImage.layer.borderWidth = 1
@@ -184,13 +172,13 @@ class ProfileTableViewCell: UITableViewCell {
     public func setUp(_ model: ProfileViewModel){
         switch model.viewModelType {
         case .info:
-            self.textLabel?.text = model.title
-            self.textLabel?.textAlignment = .left
-            self.selectionStyle = .none
+            textLabel?.text = model.title
+            textLabel?.textAlignment = .left
+            selectionStyle = .none
         case .logout:
-            self.textLabel?.text = model.title
-            self.textLabel?.textColor = .red
-            self.textLabel?.textAlignment = .center
+            textLabel?.text = model.title
+            textLabel?.textColor = .red
+            textLabel?.textAlignment = .center
         }
     }
     
